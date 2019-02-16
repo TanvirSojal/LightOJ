@@ -31,46 +31,44 @@ const double eps = 1e-9;
 int fx[] = {-1, 1, 0, 0, -1, -1, 1, 1};
 int fy[] = {0, 0, -1, 1, -1, 1, -1, 1};
  
+int kx[] = {1, 1, 2, 2, -1, -1, -2, -2};
+int ky[] = {2, -2, 1, -1, 2, -2, 1, -1};
+ 
 int TLx[] = {0, -1, -1, 0};    int TLy[] = {-1, -1, 0, 0};
 int TRx[] = {-1, -1, 0, 0};    int TRy[] = {0, 1, 1, 0};
 int BLx[] = {0, 1, 1, 0};      int BLy[] = {-1, -1, 0, 0};
 int BRx[] = {0, 1, 1, 0};      int BRy[] = {1, 1, 0, 0};
  
-char a[100][100];
-bool vis[100][100];
+#define MX 24
  
 int n, m;
-int X1, Y1, X2, Y2, X3, Y3;
-int res;
- 
-struct Girl{
-    int i, j, t;
-};
+char A[MX][MX];
+int vis[MX][MX];
+int dist[MX][MX];
+int color;
+int ai, aj, bi, bj, ci, cj, hi, hj;
  
 bool valid(int i, int j){
-    return (vis[i][j]==0 && a[i][j]!='#' && a[i][j]!='m');
+    return (i >= 1 && i <= n && j >= 1 && j <= m && vis[i][j] < color && A[i][j] != '#' && A[i][j] != 'm');
 }
  
-void BFS(Girl s){
-    queue < Girl > Q;
-    Q.push(s);
-    vis[s.i][s.j] = 1;
-    while(!Q.empty()){
-        Girl z = Q.front();
-        Q.pop();
-        int x = z.i;
-        int y = z.j;
-        int t = z.t;
-        if (a[x][y]=='h'){
-            res = max(res, t);
-            return;
-        }
-        for (int it=0; it<4; it++){
-            int p = x + fx[it];
-            int q = y + fy[it];
-            if (valid(p, q)){
-                vis[p][q] = 1;
-                Q.push({p, q, t+1});
+void BFS(int si, int sj){
+    vis[si][sj] = color;
+    dist[si][sj] = 0;
+    queue < pii > q;
+    q.push({si, sj});
+ 
+    while(!q.empty()){
+        int i = q.front().fi;
+        int j = q.front().se;
+        q.pop();
+        FOR(it, 4){
+            int x = i + fx[it];
+            int y = j + fy[it];
+            if (valid(x, y)){
+                vis[x][y] = color;
+                dist[x][y] = dist[i][j] + 1;
+                q.push({x, y});
             }
         }
     }
@@ -78,37 +76,38 @@ void BFS(Girl s){
  
 int main()
 {
-    //READ("input.txt");
-    int T; cin >> T;
-    for (int cs=1; cs<=T; cs++){
-        cin >> n >> m;
-        for (int i=0; i<n; i++){
-            for (int j=0; j<m; j++){
-                cin >> a[i][j];
-                if (a[i][j]=='a'){
-                    X1 = i; Y1 = j;
+    //READ("in.txt");
+    //WRITE("output.txt");
+    int T; scanf("%d", &T);
+    FOR1(cs, T){
+        scanf("%d%d", &n, &m);
+        FOR1(i, n){
+            scanf("\n");
+            FOR1(j, m){
+                scanf("%c", &A[i][j]);
+                if (A[i][j] == 'a'){
+                    ai = i;
+                    aj = j;
                 }
-                else if (a[i][j]=='b'){
-                    X2 = i; Y2 = j;
+                else if (A[i][j] == 'b'){
+                    bi = i;
+                    bj = j;
                 }
-                else if (a[i][j]=='c'){
-                    X3 = i; Y3 = j;
+                else if (A[i][j] == 'c'){
+                    ci = i;
+                    cj = j;
+                }
+                else if (A[i][j] == 'h'){
+                    hi = i;
+                    hj = j;
                 }
             }
         }
- 
-        BFS({X1, Y1, 0});
-        memset(vis, 0, sizeof(vis));
- 
-        BFS({X2, Y2, 0});
-        memset(vis, 0, sizeof(vis));
- 
-        BFS({X3, Y3, 0});
-        memset(vis, 0, sizeof(vis));
- 
+        color++;
+        BFS(hi, hj);
+        int res = max(dist[ai][aj], max(dist[bi][bj], dist[ci][cj]));
         printf("Case %d: %d\n", cs, res);
-        res = 0;
-    }
  
+    }
     return 0;
 }
