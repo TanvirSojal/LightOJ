@@ -33,6 +33,7 @@ double solve(int n){
     res += cnt;
     res /= (cnt - 1);
     // formula: X = (N + E(D1) + E(D2) + .... + E(Dn)) / (N - 1)
+    // D1, D2,...,Dn are all divisors of N except 1 and N
 
     return res;
 }
